@@ -29,61 +29,65 @@
 	<br>
 </div>
 <script type="text/javascript">
-	"use strict";
+    "use strict";
 
-	var textElem = document.getElementById("clocktext");
-	var hhmmElem = document.getElementById("clockhhmm");
-	var secondsTextElem = document.getElementById("clockseconds");
-	var dateTextElem = document.getElementById("clockdate");
-	var targetWidth = 0.92;     // Proportion of full screen width
-	var targetHeight = 1.0;    // Proportion of full screen height
-	var curFontSize = 20;  // starting font size
-	var displaySeconds = true;
+    var textElem = document.getElementById("clocktext");
+    var hhmmElem = document.getElementById("clockhhmm");
+    var secondsTextElem = document.getElementById("clockseconds");
+    var dateTextElem = document.getElementById("clockdate");
+    var targetWidth = 0.92;     // Proportion of full screen width
+    var targetHeight = 1.0;    // Proportion of full screen height
+    var curFontSize = 20;  // starting font size
+    var displaySeconds = true;
 
-	function toggleSeconds() {
-		displaySeconds = !displaySeconds;
-		updateClock();
-		updateTextSize();
-	}
+    function toggleSeconds() {
+        displaySeconds = !displaySeconds;
+        updateClock();
+        updateTextSize();
+    }
 
-	function updateClock() {
-		var d = new Date();
-		var s = "";
-		s += (10 > d.getHours  () ? "0" : "") + d.getHours  () + ":";
-		s += (10 > d.getMinutes() ? "0" : "") + d.getMinutes();
-		hhmmElem.textContent = s;
+    function updateClock() {
+        var d = new Date();
+        var s = "";
+        s += (10 > d.getHours() ? "0" : "") + d.getHours() + ":";
+        s += (10 > d.getMinutes() ? "0" : "") + d.getMinutes();
+        hhmmElem.textContent = s;
 
-		s = "";
-		if (displaySeconds) {
-			s += ":" + (10 > d.getSeconds() ? "0" : "") + d.getSeconds();
-		}
-		secondsTextElem.textContent = s;
-
-		dateTextElem.textContent = ["Sunday", "Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][d.getDay()] +
-			" " + d.getFullYear() + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" + ("0"+d.getDate()).slice(-2);
-
-		setTimeout(updateClock, 1000 - d.getTime() % 1000 + 20);
-	}
-
-	function updateTextSize() {
-		for (var i = 0; 3 > i; i++) {  // Iterate for better convergence
-			var estFontSizeForWidth  = curFontSize * targetWidth  / (textElem.offsetWidth  / textElem.parentNode.offsetWidth);
-			var estFontSizeForHeight = curFontSize * targetHeight / (textElem.offsetHeight / textElem.parentNode.offsetHeight);
-			curFontSize = Math.min(estFontSizeForWidth, estFontSizeForHeight);
-			hhmmElem.style.fontSize = curFontSize + "pt";
-			secondsTextElem.style.fontSize = curFontSize/4 + "pt";
-			dateTextElem.style.fontSize = curFontSize/6 + "pt";
+        s = "";
+        if (displaySeconds) {
+            s += ":" + (10 > d.getSeconds() ? "0" : "") + d.getSeconds();
         }
-	}
+        secondsTextElem.textContent = s;
 
-	updateClock();
-	updateTextSize();
-	window.addEventListener("resize", updateTextSize);
-	window.addEventListener("click", toggleSeconds);
+        dateTextElem.textContent = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][d.getDay()] +
+            " " + d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2);
 
-	//20190108MB: it seems that modern browsers do not allow hiding of the address bar (due to phishing concerns, so I'm currently aborting the idea of a pop-up that has all the toolbars hidden.
-	// var clockWindow = window.open("", "clockWindow", "height=100,menubar=no,scrollbars=no,titlebar=no,status=no,location=no", true);
-	// clockWindow.document.write("<p>this is the popup window</p>")
+        setTimeout(updateClock, 1000 - d.getTime() % 1000 + 20);
+    }
+
+    function updateTextSize() {
+        for (var i = 0; 3 > i; i++) {  // Iterate for better convergence
+            var estFontSizeForWidth = curFontSize * targetWidth / (textElem.offsetWidth / textElem.parentNode.offsetWidth);
+            var estFontSizeForHeight = curFontSize * targetHeight / (textElem.offsetHeight / textElem.parentNode.offsetHeight);
+            curFontSize = Math.min(estFontSizeForWidth, estFontSizeForHeight);
+            hhmmElem.style.fontSize = curFontSize + "pt";
+            secondsTextElem.style.fontSize = curFontSize / 4 + "pt";
+            dateTextElem.style.fontSize = curFontSize / 4 + "pt";
+        }
+    }
+
+    updateClock();
+    updateTextSize();
+    window.addEventListener("resize", updateTextSize);
+    window.addEventListener("click", toggleSeconds);
+
+    //20190108MB: it seems that modern browsers do not allow hiding of the address bar (due to phishing concerns, so I'm currently aborting the idea of a pop-up that has all the toolbars hidden.
+    var destWindowName = 'clockWindow';
+    if (window.name !== destWindowName) {
+		// re-open in a popup
+        var clockWindow = window.open("./clock.html", destWindowName, "top=-1,left=10000,width=260,height=120,menubar=no,scrollbars=no,titlebar=no,toolbar=no,status=no,location=yes", true);
+        // clockWindow.document.write("<p>this is the popup window</p>")
+    }
 </script>
 </body>
 </html>
