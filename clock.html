@@ -81,7 +81,8 @@
     window.addEventListener("resize", updateTextSize);
     window.addEventListener("click", toggleSeconds);
 
-    //20190108MB: it seems that modern browsers do not allow hiding of the address bar (due to phishing concerns, so I'm currently aborting the idea of a pop-up that has all the toolbars hidden.
+    // Bring this up in a minimal browser pop-up window. Modern browsers limit how much stuff you can
+    // hide (due to phishing concerns), so just hide all we can and live with what doesn't hide.
     var destWindowName = 'clockWindow';
     if (window.name !== destWindowName) {
 		// re-open in a popup
