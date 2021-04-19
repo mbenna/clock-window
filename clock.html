@@ -36,7 +36,7 @@
     var secondsTextElem = document.getElementById("clockseconds");
     var dateTextElem = document.getElementById("clockdate");
     var targetWidth = 0.92;     // Proportion of full screen width
-    var targetHeight = 1.0;    // Proportion of full screen height
+    var targetHeight = .98;     // Proportion of full screen height
     var curFontSize = 20;  // starting font size
     var displaySeconds = true;
 
@@ -85,8 +85,8 @@
             var estFontSizeForHeight = curFontSize * targetHeight / (textElem.offsetHeight / textElem.parentNode.offsetHeight);
             curFontSize = Math.min(estFontSizeForWidth, estFontSizeForHeight);
             hhmmElem.style.fontSize = curFontSize + "pt";
-            secondsTextElem.style.fontSize = curFontSize / 4 + "pt";
-            dateTextElem.style.fontSize = curFontSize / 4 + "pt";
+            secondsTextElem.style.fontSize = curFontSize / 3 + "pt";
+            dateTextElem.style.fontSize = curFontSize / 3 + "pt";
         }
     }
 
