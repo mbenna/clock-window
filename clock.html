@@ -21,7 +21,7 @@
 </head>
 
 <body style="display:flex; height:100%; margin:0; padding:0; vertical-align:middle; justify-content:center; align-items:center">
-<div id="clocktext" style="font-kerning:none; vertical-align: middle; font-size: 8pt">
+<div id="clocktext" style="font-kerning:none; vertical-align: middle; font-size: 8pt; text-align:center">
 	<span id="clockhhmm" style="font-weight: 400"></span>
 	<span id="clockseconds" style="vertical-align:text-bottom; color:#aaaaaa"></span>
 	<br>
@@ -39,6 +39,7 @@
     var targetHeight = .98;     // Proportion of full screen height
     var curFontSize = 20;  // starting font size
     var displaySeconds = true;
+    var oldDay = undefined
 
     const urlParams = new URLSearchParams(window.location.search);
     const background = urlParams.get('background');
@@ -76,6 +77,10 @@
         dateTextElem.textContent = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][d.getDay()] +
             " " + d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2);
 
+        if (d.getDay() !== oldDay) {
+            oldDay = d.getDay()
+	        updateTextSize()
+        }
         setTimeout(updateClock, 1000 - d.getTime() % 1000 + 20);
     }
 
@@ -86,7 +91,7 @@
             curFontSize = Math.min(estFontSizeForWidth, estFontSizeForHeight);
             hhmmElem.style.fontSize = curFontSize + "pt";
             secondsTextElem.style.fontSize = curFontSize / 3 + "pt";
-            dateTextElem.style.fontSize = curFontSize / 3 + "pt";
+            dateTextElem.style.fontSize = curFontSize / 3.5 + "pt";
         }
     }
 
@@ -100,7 +105,7 @@
     var destWindowName = 'clockWindow';
     if (window.name !== destWindowName) {
 		// re-open in a popup
-        var clockWindow = window.open("./clock.html", destWindowName, "top=-1,left=10000,width=360,height=180,menubar=no,scrollbars=no,titlebar=no,toolbar=no,status=no,location=yes");
+        var clockWindow = window.open("./clock.html", destWindowName, "top=-1,left=10000,width=220,height=110,menubar=no,scrollbars=no,titlebar=no,toolbar=no,status=no,location=yes");
         // clockWindow.document.write("<p>this is the popup window</p>")
     }
 </script>
