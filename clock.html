@@ -74,7 +74,7 @@
         }
         secondsTextElem.textContent = s;
 
-        dateTextElem.textContent = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][d.getDay()] +
+        dateTextElem.textContent = ["Sunday", "Monday", "Tuesday", "Wed", "Thursday", "Friday", "Saturday"][d.getDay()] +
             " " + d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2);
 
         if (d.getDay() !== oldDay) {
