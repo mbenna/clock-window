@@ -9,7 +9,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 	<title>Clock</title>
-	<style type="text/css">
+	<style>
 		/* Customizable font and colors */
 		html {
 			background: #000000;
@@ -17,15 +17,24 @@
 			font-family: sans-serif;
 			font-weight: normal;
 		}
+		.clockseconds {
+			color: #aaaaaa;
+            vertical-align:text-bottom;
+		}
+		.clockdate {
+			color:#aaaaaa;
+			text-align:center;
+            vertical-align:text-top;
+		}
 	</style>
 </head>
 
 <body style="display:flex; height:100%; margin:0; padding:0; vertical-align:middle; justify-content:center; align-items:center">
 <div id="clocktext" style="font-kerning:none; vertical-align: middle; font-size: 8pt; text-align:center">
 	<span id="clockhhmm" style="font-weight: 400"></span>
-	<span id="clockseconds" style="vertical-align:text-bottom; color:#aaaaaa"></span>
+	<span id="clockseconds" class="clockseconds"></span>
 	<br>
-	<div id="clockdate" style="vertical-align:text-top; text-align:center; color:#aaaaaa"></div>
+	<div id="clockdate" class="clockdate"></div>
 	<br>
 </div>
 <script type="text/javascript">
