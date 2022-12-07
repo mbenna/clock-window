@@ -114,7 +114,8 @@
     var destWindowName = 'clockWindow';
     if (window.name !== destWindowName) {
 		// re-open in a popup
-        var clockWindow = window.open("./clock.html", destWindowName, "top=-1,left=10000,width=220,height=110,menubar=no,scrollbars=no,titlebar=no,toolbar=no,status=no,location=yes");
+        // var clockWindow = window.open("./clock.html", destWindowName, "top=-1,left=10000,width=220,height=110,menubar=no,scrollbars=no,titlebar=no,toolbar=no,status=no,location=yes");
+        var clockWindow = window.open("./clock.html", destWindowName, "top=10000,left=0,width=170,height=90,menubar=no,scrollbars=no,titlebar=no,toolbar=no,status=no,location=yes");
         // clockWindow.document.write("<p>this is the popup window</p>")
     }
 </script>
