@@ -226,33 +226,11 @@
             document.getElementById("clockbackground-overlay1").style.backgroundColor = backgroundColors[(Math.floor(now.getMinutes() * 60 + now.getSeconds() / colorChangeSeconds) % (colorLoopSeconds / colorChangeSeconds)) % backgroundColors.length];
             document.getElementById("clockbackground-overlay2").style.width = (now.getSeconds() % colorChangeSeconds) * 100 / (colorChangeSeconds - 1) + "%";
 
-            // } else {
-            //     this.timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-            //     this.secondsStr = ":" + now.getSeconds().toString().padStart(2, '0');
-            //     this.dateStr = ["Sunday", "Monday", "Tuesday", "Wed", "Thursday", "Friday", "Saturday"][now.getDay()] +
-            //         " " + now.getFullYear() + "-" + ("0" + (now.getMonth() + 1)).slice(-2) + "-" + ("0" + now.getDate()).slice(-2);
-            // }
-
-
-            //     if (now.getDay() != this.oldDay) {
-            //         this.oldDay = now.getDay()
-            //         this.updateTextSize()
-            //         this.pendingResize = true;
-            //     }
-
-            //     this.clockTimeoutId = setTimeout(() => this.refreshClock(), 1000 - now.getTime() % 1000 + 20);
-
-            // }
-            var s = "";
-            s += (10 > now.getHours() ? "0" : "") + now.getHours() + ":";
-            s += (10 > now.getMinutes() ? "0" : "") + now.getMinutes();
-            hhmmElem.textContent = s;
-
-            s = "";
-            if (displaySeconds) {
-                s += ":" + (10 > now.getSeconds() ? "0" : "") + now.getSeconds();
-            }
-            secondsTextElem.textContent = s;
+            hhmmElem.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+            if (displaySeconds)
+                secondsTextElem.textContent = ":" + now.getSeconds().toString().padStart(2, '0');
+            else
+                secondsTextElem.textContent = "";
 
             dateTextElem.textContent = ["Sunday", "Monday", "Tuesday", "Wed", "Thursday", "Friday", "Saturday"][now.getDay()] +
                 " " + now.getFullYear() + "-" + ("0" + (now.getMonth() + 1)).slice(-2) + "-" + ("0" + now.getDate()).slice(-2);
@@ -265,7 +243,6 @@
         }
 
         function updateTextSize() {
-            // hide the workout elements and show the clock elements
             document.getElementById("workoutdiv").style.display = workoutMode ? "flex" : "none";
             document.getElementById("clockdiv").style.display = workoutMode ? "none" : "flex";
             var clockContainerElement = document.getElementById("clockcontainer");
