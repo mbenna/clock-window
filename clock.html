@@ -80,7 +80,7 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 3%;
+            height: 2%;
             z-index: -10;
         }
 
@@ -206,15 +206,31 @@
         }
 
         // create spans in the workoutcolorsdiv for each workout background color
-        var colorsToDisplay = colorLoopSeconds / colorChangeSeconds;
+        var colorsToDisplay = Math.floor(colorLoopSeconds / colorChangeSeconds);
         for (var i = 0; i < colorsToDisplay; i++) {
             var span = document.createElement("span");
             span.style.backgroundColor = backgroundColors[i];
             span.style.width = (100 / colorsToDisplay) + "%";
             span.style.height = "100%";
             span.style.display = "inline-block";
+            span.style.boxSizing = "border-box";
+            span.id = "workoutcolor" + i;
             document.getElementById("workoutcolorsdiv").appendChild(span);
         }
+
+        let mouseTimeout;
+        function hideCursor() {
+            document.body.style.cursor = 'none';
+        }
+
+        function resetMouseTimeout() {
+            document.body.style.cursor = 'default';
+            clearTimeout(mouseTimeout);
+            mouseTimeout = setTimeout(hideCursor, 2000);
+        }
+
+        document.addEventListener('mousemove', resetMouseTimeout);
+        resetMouseTimeout();
 
         function onClickHandler() {
             if (workoutMode) {
@@ -235,8 +251,15 @@
             document.getElementById("workoutminutes").textContent = now.getMinutes().toString().padStart(2, '0') + ":";
             document.getElementById("workoutseconds").textContent = now.getSeconds().toString().padStart(2, '0');
 
-            document.getElementById("clockbackground-overlay1").style.backgroundColor = backgroundColors[(Math.floor(now.getMinutes() * 60 + now.getSeconds() / colorChangeSeconds) % (colorLoopSeconds / colorChangeSeconds)) % backgroundColors.length];
+            var backgroundColorIndex = (Math.floor(now.getMinutes() * 60 + now.getSeconds() / colorChangeSeconds) % (colorLoopSeconds / colorChangeSeconds)) % backgroundColors.length;
+            document.getElementById("clockbackground-overlay1").style.backgroundColor = backgroundColors[backgroundColorIndex];
             document.getElementById("clockbackground-overlay2").style.width = (now.getSeconds() % colorChangeSeconds) * 100 / (colorChangeSeconds - 1) + "%";
+            for (var i = 0; i < colorsToDisplay; i++) {
+                var span = document.getElementById("workoutcolor" + i);
+                if (span) {
+                    span.style.border = i == backgroundColorIndex ? "1px solid white" : "none";
+                }
+            }
 
             hhmmElem.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
             if (displaySeconds)
