@@ -6,118 +6,302 @@
 
 <!DOCTYPE html>
 <html lang="en" style="height:100%; margin:0; padding:0">
+
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-	<title>Clock</title>
-	<style>
-		/* Customizable font and colors */
-		html {
-			background: #000000;
-			color: #FFFFFF;
-			font-family: sans-serif;
-			font-weight: normal;
-		}
-		.clockseconds {
-			color: #aaaaaa;
-            vertical-align:text-bottom;
-		}
-		.clockdate {
-			color:#aaaaaa;
-			text-align:center;
-            vertical-align:text-top;
-		}
-	</style>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Clock</title>
+    <style>
+        html {
+            background: #000000;
+            color: #FFFFFF;
+            font-family: sans-serif;
+            font-weight: normal;
+        }
+
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        body::-webkit-scrollbar {
+            display: none;
+        }
+
+        body {
+            display: flex;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            vertical-align: middle;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+
+            /* Hide scrollbars */
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+            overflow: hidden;
+        }
+
+        .clockcontainer {
+            position: relative;
+            font-kerning: none;
+            vertical-align: middle;
+            font-size: 8pt;
+            text-align: center;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .clockbackground-overlay1 {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: darkblue;
+            z-index: -2;
+        }
+
+        .clockbackground-overlay2 {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 75%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.15);
+            z-index: -1;
+        }
+
+        .currentclockbox {
+            font-kerning: none;
+            vertical-align: middle;
+            font-size: 8pt;
+            text-align: center;
+            /* border: 1px solid aqua; */
+        }
+
+        .clockhhmm {
+            font-weight: 400;
+            /* border: 1px solid rgb(138, 138, 12); */
+        }
+
+        .clockseconds {
+            color: #aaaaaa;
+            text-align: center;
+            vertical-align: text-bottom;
+            /* border: 1px solid blueviolet; */
+        }
+
+        .clockdate {
+            color: #aaaaaa;
+            text-align: center;
+            vertical-align: text-top;
+            /* border: 1px solid green; */
+        }
+
+        .workouthour {
+            position: absolute;
+            left: 10px;
+            top: 7px;
+            color: #999999;
+            font-weight: 100;
+            vertical-align: top;
+            text-align: left;
+            z-index: 10;
+        }
+
+        .workoutseconds {
+            font-weight: 400;
+            color: white
+        }
+    </style>
 </head>
 
-<body style="display:flex; height:100%; margin:0; padding:0; vertical-align:middle; justify-content:center; align-items:center">
-<div id="clocktext" style="font-kerning:none; vertical-align: middle; font-size: 8pt; text-align:center">
-	<span id="clockhhmm" style="font-weight: 400"></span>
-	<span id="clockseconds" class="clockseconds"></span>
-	<br>
-	<div id="clockdate" class="clockdate"></div>
-	<br>
-</div>
-<script type="text/javascript">
-    "use strict";
+<body>
+    <div id="clockcontainer" class="clockcontainer">
+        <div id="workoutdiv">
+            <div id="clockbackground-overlay1" class="clockbackground-overlay1">
+            </div>
+            <div id="clockbackground-overlay2" class="clockbackground-overlay2"></div>
+            <div class="workouthour" id="workouthour">Loading...</div>
+            <div id="currentworkoutbox" class="currentclockbox">
+                <div id="workoutdiv">
+                    <span id="workoutminutes" class="workoutseconds">{{minutesStr}}</span>
+                    <span id="workoutseconds" class="workoutseconds">{{secondsStr}}</span>
+                </div>
+            </div>
+        </div>
+        <div id="clockdiv">
+            <div id="currentclockbox" class="currentclockbox">
+                <span id="clockhhmm" class="clockhhmm">Loading...</span>
+                <span id="clockseconds" class="clockseconds">{{secondsStr}}</span>
+                <div id="clockdate" class="clockdate">{{dateStr}}</div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        "use strict";
 
-    var textElem = document.getElementById("clocktext");
-    var hhmmElem = document.getElementById("clockhhmm");
-    var secondsTextElem = document.getElementById("clockseconds");
-    var dateTextElem = document.getElementById("clockdate");
-    var targetWidth = 0.92;     // Proportion of full screen width
-    var targetHeight = .98;     // Proportion of full screen height
-    var curFontSize = 20;  // starting font size
-    var displaySeconds = true;
-    var oldDay = undefined
+        var textElem = document.getElementById("clocktext");
+        var hhmmElem = document.getElementById("clockhhmm");
+        var secondsTextElem = document.getElementById("clockseconds");
+        var dateTextElem = document.getElementById("clockdate");
+        var targetWidth = 0.92;     // Proportion of full screen width
+        var targetHeight = .98;     // Proportion of full screen height
+        var curFontSize = 20;  // starting font size
+        var displaySeconds = true;
+        var workoutMode = false;
+        var oldDay = undefined
+        var colorLoopSeconds = 120;  // Number of seconds to loop through colors
+        var colorChangeSeconds = 15; // Number of seconds to change color
+        var backgroundColors = [
+            "darkred",
+            "darkgreen",
+            "darkblue",
+            "dimgray",
+            "SaddleBrown",
+            "Olive",
+            "Indigo",
+            "black",
+            "darkgoldenrod",
+        ];
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const background = urlParams.get('background');
-    if (background) {
-        document.body.style.backgroundColor = background;
-    }
-    const color = urlParams.get('color');
-    if (color) {
-        document.body.style.color = color;
-    }
-    const seconds = urlParams.get('seconds');
-    if (seconds) {
-        displaySeconds = parseInt(seconds);
-    }
+        const urlParams = new URLSearchParams(window.location.search);
+        const background = urlParams.get('background');
+        if (background) {
+            document.body.style.backgroundColor = background;
+        }
+        const color = urlParams.get('color');
+        if (color) {
+            document.body.style.color = color;
+        }
+        const seconds = urlParams.get('seconds');
+        if (seconds) {
+            displaySeconds = parseInt(seconds);
+        }
 
-    function toggleSeconds() {
-        displaySeconds = !displaySeconds;
-        updateClock();
+        function onClickHandler() {
+            if (workoutMode) {
+                workoutMode = false;
+                displaySeconds = false;
+            } else if (displaySeconds) {
+                workoutMode = true;
+            } else {
+                displaySeconds = true;
+            }
+            refreshClock();
+            updateTextSize();
+        }
+
+        function refreshClock() {
+            var now = new Date();
+            document.getElementById("workouthour").textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+            document.getElementById("workoutminutes").textContent = now.getMinutes().toString().padStart(2, '0') + ":";
+            document.getElementById("workoutseconds").textContent = now.getSeconds().toString().padStart(2, '0');
+
+            document.getElementById("clockbackground-overlay1").style.backgroundColor = backgroundColors[(Math.floor(now.getMinutes() * 60 + now.getSeconds() / colorChangeSeconds) % (colorLoopSeconds / colorChangeSeconds)) % backgroundColors.length];
+            document.getElementById("clockbackground-overlay2").style.width = (now.getSeconds() % colorChangeSeconds) * 100 / (colorChangeSeconds - 1) + "%";
+
+            // } else {
+            //     this.timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+            //     this.secondsStr = ":" + now.getSeconds().toString().padStart(2, '0');
+            //     this.dateStr = ["Sunday", "Monday", "Tuesday", "Wed", "Thursday", "Friday", "Saturday"][now.getDay()] +
+            //         " " + now.getFullYear() + "-" + ("0" + (now.getMonth() + 1)).slice(-2) + "-" + ("0" + now.getDate()).slice(-2);
+            // }
+
+
+            //     if (now.getDay() != this.oldDay) {
+            //         this.oldDay = now.getDay()
+            //         this.updateTextSize()
+            //         this.pendingResize = true;
+            //     }
+
+            //     this.clockTimeoutId = setTimeout(() => this.refreshClock(), 1000 - now.getTime() % 1000 + 20);
+
+            // }
+            var s = "";
+            s += (10 > now.getHours() ? "0" : "") + now.getHours() + ":";
+            s += (10 > now.getMinutes() ? "0" : "") + now.getMinutes();
+            hhmmElem.textContent = s;
+
+            s = "";
+            if (displaySeconds) {
+                s += ":" + (10 > now.getSeconds() ? "0" : "") + now.getSeconds();
+            }
+            secondsTextElem.textContent = s;
+
+            dateTextElem.textContent = ["Sunday", "Monday", "Tuesday", "Wed", "Thursday", "Friday", "Saturday"][now.getDay()] +
+                " " + now.getFullYear() + "-" + ("0" + (now.getMonth() + 1)).slice(-2) + "-" + ("0" + now.getDate()).slice(-2);
+
+            if (now.getDay() !== oldDay) {
+                oldDay = now.getDay()
+                updateTextSize()
+            }
+            setTimeout(refreshClock, 1000 - now.getTime() % 1000 + 20);
+        }
+
+        function updateTextSize() {
+            // hide the workout elements and show the clock elements
+            document.getElementById("workoutdiv").style.display = workoutMode ? "flex" : "none";
+            document.getElementById("clockdiv").style.display = workoutMode ? "none" : "flex";
+            var clockContainerElement = document.getElementById("clockcontainer");
+            var currentTextBox = document.getElementById(workoutMode ? "currentworkoutbox" : "currentclockbox");
+            var targetWidth = workoutMode ? .99 : .96;     // Proportion of full screen width
+            var targetHeight = workoutMode ? 1.01 : .98;     // Proportion of full screen height
+
+            for (var i = 0; 3 > i; i++) {  // Iterate for better convergence
+                var availableWidth = clockContainerElement.offsetWidth * targetWidth;
+                var availableHeight = clockContainerElement.offsetHeight * targetHeight;
+                var currentWidth = Math.max(20, currentTextBox.offsetWidth);
+                var currentHeight = Math.max(12, currentTextBox.offsetHeight);
+                var estFontSizeForWidth = curFontSize / (currentWidth / availableWidth);
+                var estFontSizeForHeight = curFontSize / (currentHeight / availableHeight);
+                curFontSize = Math.min(estFontSizeForWidth, estFontSizeForHeight);
+                curFontSize = Math.max(8, curFontSize);  // Minimum font size
+
+                var hhmmElem = document.getElementById("clockhhmm");
+                if (hhmmElem) {
+                    hhmmElem.style.fontSize = curFontSize + "pt";
+                }
+                var secondsTextElem = document.getElementById("clockseconds");
+                if (secondsTextElem) {
+                    secondsTextElem.style.fontSize = curFontSize / 3 + "pt";
+                }
+                var dateTextElem = document.getElementById("clockdate");
+                if (dateTextElem) {
+                    dateTextElem.style.fontSize = curFontSize / 3.5 + "pt";
+                }
+                var workoutHourElem = document.getElementById("workouthour");
+                if (workoutHourElem) {
+                    workoutHourElem.style.fontSize = curFontSize / 8 + "pt";
+                }
+                var workoutMinutesElem = document.getElementById("workoutminutes");
+                if (workoutMinutesElem) {
+                    workoutMinutesElem.style.fontSize = curFontSize * .7 + "pt";
+                }
+                var workoutSecondsElem = document.getElementById("workoutseconds");
+                if (workoutSecondsElem) {
+                    workoutSecondsElem.style.fontSize = curFontSize + "pt";
+                }
+            }
+        }
+
+        refreshClock();
         updateTextSize();
-    }
+        window.addEventListener("resize", updateTextSize);
+        window.addEventListener("click", onClickHandler);
 
-    function updateClock() {
-        var d = new Date();
-        var s = "";
-        s += (10 > d.getHours() ? "0" : "") + d.getHours() + ":";
-        s += (10 > d.getMinutes() ? "0" : "") + d.getMinutes();
-        hhmmElem.textContent = s;
-
-        s = "";
-        if (displaySeconds) {
-            s += ":" + (10 > d.getSeconds() ? "0" : "") + d.getSeconds();
+        // Bring this up in a minimal browser pop-up window. Modern browsers limit how much stuff you can
+        // hide (due to phishing concerns), so just hide all we can and live with what doesn't hide.
+        var destWindowName = 'clockWindow';
+        if (window.name !== destWindowName) {
+            // re-open in a popup
+            // var clockWindow = window.open("./clock.html", destWindowName, "top=-1,left=10000,width=220,height=110,menubar=no,scrollbars=no,titlebar=no,toolbar=no,status=no,location=yes");
+            var clockWindow = window.open("./clock.html", destWindowName, "top=10000,left=0,width=170,height=90,menubar=no,scrollbars=no,titlebar=no,toolbar=no,status=no,location=yes");
+            // clockWindow.document.write("<p>this is the popup window</p>")
         }
-        secondsTextElem.textContent = s;
-
-        dateTextElem.textContent = ["Sunday", "Monday", "Tuesday", "Wed", "Thursday", "Friday", "Saturday"][d.getDay()] +
-            " " + d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2);
-
-        if (d.getDay() !== oldDay) {
-            oldDay = d.getDay()
-	        updateTextSize()
-        }
-        setTimeout(updateClock, 1000 - d.getTime() % 1000 + 20);
-    }
-
-    function updateTextSize() {
-        for (var i = 0; 3 > i; i++) {  // Iterate for better convergence
-            var estFontSizeForWidth = curFontSize * targetWidth / (textElem.offsetWidth / textElem.parentNode.offsetWidth);
-            var estFontSizeForHeight = curFontSize * targetHeight / (textElem.offsetHeight / textElem.parentNode.offsetHeight);
-            curFontSize = Math.min(estFontSizeForWidth, estFontSizeForHeight);
-            hhmmElem.style.fontSize = curFontSize + "pt";
-            secondsTextElem.style.fontSize = curFontSize / 3 + "pt";
-            dateTextElem.style.fontSize = curFontSize / 3.5 + "pt";
-        }
-    }
-
-    updateClock();
-    updateTextSize();
-    window.addEventListener("resize", updateTextSize);
-    window.addEventListener("click", toggleSeconds);
-
-    // Bring this up in a minimal browser pop-up window. Modern browsers limit how much stuff you can
-    // hide (due to phishing concerns), so just hide all we can and live with what doesn't hide.
-    var destWindowName = 'clockWindow';
-    if (window.name !== destWindowName) {
-		// re-open in a popup
-        // var clockWindow = window.open("./clock.html", destWindowName, "top=-1,left=10000,width=220,height=110,menubar=no,scrollbars=no,titlebar=no,toolbar=no,status=no,location=yes");
-        var clockWindow = window.open("./clock.html", destWindowName, "top=10000,left=0,width=170,height=90,menubar=no,scrollbars=no,titlebar=no,toolbar=no,status=no,location=yes");
-        // clockWindow.document.write("<p>this is the popup window</p>")
-    }
-</script>
+    </script>
 </body>
+
 </html>
