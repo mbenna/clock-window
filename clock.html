@@ -229,9 +229,6 @@
             mouseTimeout = setTimeout(hideCursor, 2000);
         }
 
-        document.addEventListener('mousemove', resetMouseTimeout);
-        resetMouseTimeout();
-
         function onClickHandler() {
             if (workoutMode) {
                 workoutMode = false;
@@ -250,6 +247,9 @@
             document.getElementById("workouthour").textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
             document.getElementById("workoutminutes").textContent = now.getMinutes().toString().padStart(2, '0') + ":";
             document.getElementById("workoutseconds").textContent = now.getSeconds().toString().padStart(2, '0');
+
+            // Add the user agent string to the workout hour element
+            // document.getElementById("workouthour").textContent += " " + navigator.userAgent;
 
             var backgroundColorIndex = (Math.floor(now.getMinutes() * 60 + now.getSeconds() / colorChangeSeconds) % (colorLoopSeconds / colorChangeSeconds)) % backgroundColors.length;
             document.getElementById("clockbackground-overlay1").style.backgroundColor = backgroundColors[backgroundColorIndex];
@@ -326,15 +326,22 @@
         updateTextSize();
         window.addEventListener("resize", updateTextSize);
         window.addEventListener("click", onClickHandler);
+        document.addEventListener('mousemove', resetMouseTimeout);
+        resetMouseTimeout();
 
         // Bring this up in a minimal browser pop-up window. Modern browsers limit how much stuff you can
         // hide (due to phishing concerns), so just hide all we can and live with what doesn't hide.
-        var destWindowName = 'clockWindow';
-        if (window.name !== destWindowName) {
-            // re-open in a popup
-            // var clockWindow = window.open("./clock.html", destWindowName, "top=-1,left=10000,width=220,height=110,menubar=no,scrollbars=no,titlebar=no,toolbar=no,status=no,location=yes");
-            var clockWindow = window.open("./clock.html", destWindowName, "top=10000,left=0,width=170,height=90,menubar=no,scrollbars=no,titlebar=no,toolbar=no,status=no,location=yes");
-            // clockWindow.document.write("<p>this is the popup window</p>")
+
+        // If this is a SMART-TV or Tizen device, don't open a popup window
+        var userAgent = navigator.userAgent;
+        if (!userAgent.includes("SMART-TV") && !userAgent.includes("Tizen")) {
+            var destWindowName = 'clockWindow';
+            if (window.name !== destWindowName) {
+                // re-open in a popup
+                // var clockWindow = window.open("./clock.html", destWindowName, "top=-1,left=10000,width=220,height=110,menubar=no,scrollbars=no,titlebar=no,toolbar=no,status=no,location=yes");
+                var clockWindow = window.open("./clock.html", destWindowName, "top=10000,left=0,width=170,height=90,menubar=no,scrollbars=no,titlebar=no,toolbar=no,status=no,location=yes");
+                // clockWindow.document.write("<p>this is the popup window</p>")
+            }
         }
     </script>
 </body>
